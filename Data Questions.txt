@@ -1,0 +1,8 @@
+1. Year Wise Total Profit
+2. Total Revenue of a in a Particular Region in a Particular Year month wise
+3. Quantity of Sales Channel Online and Offline
+4. Item Type with the highest Priority
+5. Top 10 Countries with the Highest Profit.
+6. Item Type with the highest revenue.
+7. Units sold for a the items.
+8. 
