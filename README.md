@@ -1,1 +1,1 @@
-# My-Projects
+Aspiring Data Analyst passionate about transforming raw data into actionable insights. Skilled in Python, SQL, Power BI, and Azure, I enjoy working on projects that involve data cleaning, visualization, and analysis to uncover patterns and support data-driven decisions. My GitHub showcases hands-on projects in data analytics, visualization, and cloud-based solutions, reflecting my continuous learning and dedication to leveraging data for business impact.
