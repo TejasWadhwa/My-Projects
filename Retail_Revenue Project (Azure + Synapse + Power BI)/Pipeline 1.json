@@ -1,0 +1,219 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workspaceName": {
+            "type": "string",
+            "metadata": "Workspace name",
+            "defaultValue": "tjsynapse71"
+        },
+        "HttpServer1": {
+            "type": "string"
+        },
+        "AzureDataLakeStorage1": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "workspaceId": "[concat('Microsoft.Synapse/workspaces/', parameters('workspaceName'))]"
+    },
+    "resources": [
+        {
+            "name": "[concat(parameters('workspaceName'), '/Pipeline 1')]",
+            "type": "Microsoft.Synapse/workspaces/pipelines",
+            "apiVersion": "2019-06-01-preview",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "Copy data1",
+                        "type": "Copy",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "source": {
+                                "type": "JsonSource",
+                                "storeSettings": {
+                                    "type": "HttpReadSettings",
+                                    "requestMethod": "GET"
+                                },
+                                "formatSettings": {
+                                    "type": "JsonReadSettings"
+                                }
+                            },
+                            "sink": {
+                                "type": "ParquetSink",
+                                "storeSettings": {
+                                    "type": "AzureBlobFSWriteSettings"
+                                },
+                                "formatSettings": {
+                                    "type": "ParquetWriteSettings"
+                                }
+                            },
+                            "enableStaging": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "path": "$['event_id']"
+                                        },
+                                        "sink": {
+                                            "name": "event_id"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "path": "$['event_type']"
+                                        },
+                                        "sink": {
+                                            "name": "event_type"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "path": "$['customer_id']"
+                                        },
+                                        "sink": {
+                                            "name": "customer_id"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "path": "$['event_timestamp']"
+                                        },
+                                        "sink": {
+                                            "name": "event_timestamp"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "path": "$['payment_method']"
+                                        },
+                                        "sink": {
+                                            "name": "payment_method"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "path": "$['product_id']"
+                                        },
+                                        "sink": {
+                                            "name": "product_id"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "path": "$['product_category']"
+                                        },
+                                        "sink": {
+                                            "name": "product_category"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "path": "$['amount']"
+                                        },
+                                        "sink": {
+                                            "name": "amount",
+                                            "type": "Double"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "path": "$['location']"
+                                        },
+                                        "sink": {
+                                            "name": "location"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "path": "$['status']"
+                                        },
+                                        "sink": {
+                                            "name": "status"
+                                        }
+                                    }
+                                ]
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "Json1",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "Parquet1",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        ]
+                    }
+                ],
+                "policy": {
+                    "elapsedTimeMetric": {}
+                },
+                "annotations": [],
+                "lastPublishTime": "2025-10-29T10:08:31Z"
+            },
+            "dependsOn": [
+                "[concat(variables('workspaceId'), '/datasets/Json1')]",
+                "[concat(variables('workspaceId'), '/datasets/Parquet1')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('workspaceName'), '/Json1')]",
+            "type": "Microsoft.Synapse/workspaces/datasets",
+            "apiVersion": "2019-06-01-preview",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "[parameters('HttpServer1')]",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "Json",
+                "typeProperties": {
+                    "location": {
+                        "type": "HttpServerLocation",
+                        "relativeUrl": "manish040596/azure-data-engineer-projects/refs/heads/main/retail_transactions_bronze.json"
+                    }
+                },
+                "schema": {}
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('workspaceName'), '/Parquet1')]",
+            "type": "Microsoft.Synapse/workspaces/datasets",
+            "apiVersion": "2019-06-01-preview",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "[parameters('AzureDataLakeStorage1')]",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "Parquet",
+                "typeProperties": {
+                    "location": {
+                        "type": "AzureBlobFSLocation",
+                        "folderPath": "bronze",
+                        "fileSystem": "retailrevenue"
+                    },
+                    "compressionCodec": "snappy"
+                },
+                "schema": []
+            },
+            "dependsOn": []
+        }
+    ]
+}
